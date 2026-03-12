@@ -1,0 +1,206 @@
+.page {
+  max-width: 640px;
+}
+
+.page h1 {
+  margin-bottom: 0.5rem;
+}
+
+.loading {
+  color: var(--muted);
+}
+
+.totals {
+  margin-bottom: 2rem;
+}
+
+.totals h2,
+.results h2 {
+  font-size: 1.15rem;
+  margin-bottom: 0.75rem;
+}
+
+.leaderboard {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  background: var(--card);
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(212, 160, 58, 0.3);
+}
+
+.leaderRow {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.leaderRow:last-child {
+  border-bottom: none;
+}
+
+.rank {
+  width: 2rem;
+  font-weight: 700;
+  color: var(--lane);
+  font-size: 1.1rem;
+}
+
+.name {
+  flex: 1;
+  font-weight: 600;
+}
+
+.points {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.help {
+  font-size: 0.9rem;
+  color: var(--muted);
+  margin-bottom: 1rem;
+  line-height: 1.4;
+}
+
+.results select {
+  width: 100%;
+  max-width: 280px;
+  padding: 0.6rem 0.75rem;
+  margin-bottom: 1rem;
+  border: 2px solid var(--lane);
+  border-radius: 8px;
+  background: var(--court);
+  color: var(--text);
+  font-size: 1rem;
+}
+
+.gameList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.gameRow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  background: var(--card);
+  border-radius: 8px;
+  flex-wrap: wrap;
+}
+
+.spread {
+  min-width: 140px;
+  font-weight: 600;
+}
+
+.owner {
+  min-width: 80px;
+  color: var(--lane);
+}
+
+.input {
+  width: 80px;
+  padding: 0.4rem 0.5rem;
+  border: 1px solid var(--lane);
+  border-radius: 6px;
+  background: var(--court);
+  color: var(--text);
+}
+
+.result {
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.hit {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.miss {
+  color: var(--ball);
+}
+
+.outcomeButtons {
+  display: flex;
+  gap: 0.4rem;
+  margin-left: auto;
+}
+
+.winBtn,
+.lossBtn {
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  border: none;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.winBtn {
+  background: var(--accent);
+  color: #fff;
+}
+
+.lossBtn {
+  background: rgba(0, 0, 0, 0.3);
+  color: var(--muted);
+}
+
+.roundScores,
+.roundScoreRow,
+.roundScoreName,
+.roundScoreInput,
+.roundScoreBase,
+.roundScoreValue {
+  display: none;
+}
+
+.roundScores {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.roundScores h3 {
+  font-size: 1rem;
+  margin: 0 0 0.75rem;
+}
+
+.roundScores ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.roundScoreRow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.4rem 0;
+  font-size: 0.95rem;
+}
+
+.roundScoreName {
+  width: 7rem;
+}
+
+.roundScoreInput {
+  width: 4rem;
+  padding: 0.25rem 0.4rem;
+  border-radius: 6px;
+  border: 1px solid var(--lane);
+  background: var(--court);
+  color: var(--text);
+}
+
+.roundScoreBase {
+  font-size: 0.8rem;
+  color: var(--muted);
+}

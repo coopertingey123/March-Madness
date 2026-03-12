@@ -1,0 +1,203 @@
+.page {
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.header h1 {
+  margin-bottom: 0.35rem;
+}
+
+.meta {
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.loading {
+  color: var(--muted);
+}
+
+.landed {
+  text-align: center;
+  padding: 0.65rem 1rem;
+  background: rgba(0, 184, 148, 0.16);
+  border-radius: 999px;
+  margin: 0 auto 1.5rem;
+  border: 1px solid rgba(0, 184, 148, 0.7);
+  max-width: 480px;
+}
+
+.mainRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  gap: 2rem;
+  align-items: flex-start;
+  padding: 1.5rem 1.75rem;
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 18px;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(212, 160, 58, 0.4);
+}
+
+@media (max-width: 880px) {
+  .mainRow {
+    grid-template-columns: 1fr;
+    padding: 1.25rem 1rem;
+  }
+}
+
+.wheelCol {
+  display: flex;
+  justify-content: center;
+}
+
+.infoCol {
+  padding: 0.75rem 1rem;
+  background: rgba(10, 63, 50, 0.96);
+  border-radius: 14px;
+  border: 1px solid rgba(212, 160, 58, 0.4);
+}
+
+.infoCol h2 {
+  font-size: 1.05rem;
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+}
+
+.currentPlayerCard {
+  padding: 0.6rem 0.8rem;
+  border-radius: 10px;
+  background: rgba(0, 184, 148, 0.1);
+  border: 1px solid rgba(0, 184, 148, 0.7);
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.currentLabel {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
+.currentName {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.mutedSmall {
+  margin-top: 0.7rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.spinBtn {
+  margin-top: 1rem;
+  width: 100%;
+  padding: 0.7rem 1rem;
+  border-radius: 999px;
+  border: none;
+  background: var(--ball);
+  color: #fff;
+  font-weight: 700;
+  font-size: 1rem;
+  box-shadow: 0 6px 18px rgba(232, 93, 4, 0.5);
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, opacity 0.1s ease;
+}
+
+.spinBtn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 9px 26px rgba(232, 93, 4, 0.6);
+}
+
+.spinBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.done {
+  text-align: center;
+  padding: 0.9rem 1.1rem;
+  margin-top: 1.5rem;
+  background: rgba(0, 0, 0, 0.28);
+  border-radius: 999px;
+}
+
+.done p {
+  margin-bottom: 0.4rem;
+}
+
+.done button {
+  margin-left: 0.5rem;
+  padding: 0.45rem 0.9rem;
+  background: var(--lane);
+  color: var(--court);
+  border: none;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.link {
+  color: var(--lane);
+  font-weight: 600;
+}
+
+.assignments {
+  margin-top: 2.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.assignments h2 {
+  font-size: 1.05rem;
+  margin-bottom: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.assignmentGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.assignmentCol {
+  min-width: 140px;
+  flex: 1;
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 10px;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.assignmentPlayer {
+  font-size: 0.9rem;
+  margin: 0 0 0.4rem;
+  color: var(--lane);
+}
+
+.assignmentTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.assignmentTag {
+  font-size: 0.8rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+  background: rgba(212, 160, 58, 0.1);
+  border: 1px solid rgba(212, 160, 58, 0.6);
+}
+
+.muted {
+  color: var(--muted);
+}

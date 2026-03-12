@@ -1,0 +1,1 @@
+{"root":["./src/app.tsx","./src/main.tsx","./src/types.ts","./src/vite-env.d.ts","./src/components/wheel.tsx","./src/context/gamecontext.tsx","./src/lib/db.ts","./src/lib/firebase.ts","./src/pages/home.tsx","./src/pages/players.tsx","./src/pages/rounds.tsx","./src/pages/scoreboard.tsx","./src/pages/viewgame.tsx","./src/pages/wheel.tsx"],"version":"5.9.3"}

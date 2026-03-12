@@ -1,0 +1,105 @@
+.page {
+  max-width: 560px;
+}
+
+.page h1 {
+  margin-bottom: 0.25rem;
+}
+
+.sub {
+  color: var(--muted);
+  margin-bottom: 1.5rem;
+}
+
+.loading {
+  color: var(--muted);
+}
+
+.create {
+  margin-bottom: 2rem;
+  padding: 1.25rem;
+  background: var(--card);
+  border-radius: 12px;
+  border: 1px solid rgba(212, 160, 58, 0.3);
+}
+
+.create h2 {
+  font-size: 1.1rem;
+  margin-bottom: 0.75rem;
+}
+
+.create input,
+.create textarea {
+  display: block;
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  margin-bottom: 0.75rem;
+  border: 2px solid var(--lane);
+  border-radius: 8px;
+  background: var(--court);
+  color: var(--text);
+  font-size: 1rem;
+}
+
+.create textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+.create button {
+  padding: 0.6rem 1.25rem;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+.create button:disabled {
+  opacity: 0.7;
+}
+
+.list h2 {
+  font-size: 1.1rem;
+  margin-bottom: 0.75rem;
+}
+
+.list ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.roundRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.roundRow strong {
+  display: block;
+}
+
+.meta {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.link {
+  padding: 0.4rem 0.8rem;
+  background: var(--lane);
+  color: var(--court);
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+.link:hover {
+  text-decoration: none;
+  filter: brightness(1.1);
+}
+
+.muted {
+  color: var(--muted);
+}

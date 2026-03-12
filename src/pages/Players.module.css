@@ -1,0 +1,98 @@
+.page {
+  max-width: 520px;
+}
+
+.page h1 {
+  margin-bottom: 0.25rem;
+}
+
+.sub {
+  color: var(--muted);
+  margin-bottom: 1.5rem;
+}
+
+.loading {
+  color: var(--muted);
+}
+
+.addRow {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.addRow input {
+  flex: 1;
+  padding: 0.6rem 0.75rem;
+  border: 2px solid var(--lane);
+  border-radius: 8px;
+  background: var(--court);
+  color: var(--text);
+}
+
+.addRow button {
+  padding: 0.6rem 1rem;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+.addRow button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.order {
+  width: 2rem;
+  font-weight: 700;
+  color: var(--lane);
+}
+
+.name {
+  flex: 1;
+}
+
+.item input {
+  flex: 1;
+  padding: 0.4rem 0.5rem;
+  border: 1px solid var(--lane);
+  border-radius: 6px;
+  background: var(--court);
+  color: var(--text);
+}
+
+.small {
+  padding: 0.35rem 0.6rem;
+  font-size: 0.85rem;
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid var(--muted);
+  border-radius: 6px;
+}
+
+.small:hover {
+  color: var(--text);
+  border-color: var(--text);
+}
+
+.muted {
+  color: var(--muted);
+  font-size: 0.9rem;
+  margin-top: 1rem;
+}

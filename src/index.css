@@ -1,0 +1,51 @@
+:root {
+  --court: #0d3b2e;
+  --lane: #d4a03a;
+  --ball: #e85d04;
+  --net: #6a0d2e;
+  --text: #f4f1de;
+  --muted: #9a9a7a;
+  --card: #1a4d3e;
+  --accent: #00b894;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Outfit', system-ui, sans-serif;
+  background: var(--court);
+  color: var(--text);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3 {
+  font-family: 'Bebas Neue', sans-serif;
+  letter-spacing: 0.04em;
+  margin: 0;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+a {
+  color: var(--lane);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+input, select {
+  font-family: inherit;
+}

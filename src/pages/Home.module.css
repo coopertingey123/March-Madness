@@ -1,0 +1,132 @@
+.home {
+  text-align: center;
+  padding: 2rem 0;
+}
+
+.home h1 {
+  font-size: clamp(2rem, 5vw, 3rem);
+  color: var(--lane);
+  margin-bottom: 0.5rem;
+}
+
+.tagline {
+  color: var(--muted);
+  font-size: 1.15rem;
+  margin-bottom: 2rem;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 1.5rem;
+  background: var(--card);
+  border-radius: 12px;
+  border: 2px solid transparent;
+  transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+  text-align: left;
+  color: inherit;
+}
+
+.card:hover {
+  border-color: var(--lane);
+  transform: translateY(-2px);
+  text-decoration: none;
+  color: inherit;
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.5);
+}
+
+.card h2 {
+  font-size: 1.35rem;
+  color: var(--text);
+  margin-bottom: 0.5rem;
+}
+
+.card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.card input {
+  margin-top: 1rem;
+  margin-bottom: 0.8rem;
+  padding: 0.6rem 0.75rem;
+  border-radius: 8px;
+  border: 2px solid var(--lane);
+  background: var(--court);
+  color: var(--text);
+  font-size: 0.95rem;
+}
+
+.card button {
+  align-self: flex-start;
+  padding: 0.6rem 1.3rem;
+  border-radius: 999px;
+  border: none;
+  background: var(--ball);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(232, 93, 4, 0.5);
+  transition: transform 0.12s ease, box-shadow 0.12s ease, opacity 0.1s ease;
+}
+
+.card button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 9px 26px rgba(232, 93, 4, 0.6);
+}
+
+.card button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.roleRow {
+  display: none;
+}
+
+.error {
+  color: #ffb4a2;
+  margin-top: 0.5rem;
+}
+
+.viewer {
+  color: var(--muted);
+  margin-bottom: 0.75rem;
+}
+
+.viewerLink {
+  display: inline-block;
+  margin-left: 0.25rem;
+  font-family: monospace;
+  font-size: 0.9rem;
+}
+
+.dashboardLinks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: center;
+  margin-top: 1.25rem;
+}
+
+.dashboardLinks button {
+  padding: 0.55rem 1.4rem;
+  border-radius: 999px;
+  border: none;
+  background: var(--card);
+  color: var(--text);
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid rgba(212, 160, 58, 0.6);
+}
