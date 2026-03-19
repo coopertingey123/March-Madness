@@ -88,21 +88,24 @@
 .gameRow {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 0.75rem;
-  padding: 0.5rem 0.75rem;
+  padding: 0.6rem 0.75rem;
   background: var(--card);
   border-radius: 8px;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
 }
 
 .spread {
   min-width: 140px;
   font-weight: 600;
+  flex: 1;
 }
 
 .owner {
   min-width: 80px;
   color: var(--lane);
+  flex: 0 0 90px;
 }
 
 .input {
@@ -117,6 +120,8 @@
 .result {
   font-size: 0.9rem;
   color: var(--muted);
+  flex: 0 0 70px;
+  text-align: right;
 }
 
 .hit {
@@ -131,16 +136,22 @@
 .outcomeButtons {
   display: flex;
   gap: 0.4rem;
-  margin-left: auto;
+  flex: 0 0 auto;
 }
 
 .winBtn,
 .lossBtn {
-  padding: 0.3rem 0.7rem;
+  padding: 0.38rem 0.8rem;
   border-radius: 999px;
-  border: none;
-  font-size: 0.8rem;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  font-size: 0.85rem;
   cursor: pointer;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, opacity 0.12s ease, background 0.12s ease;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.18);
 }
 
 .winBtn {
@@ -148,9 +159,123 @@
   color: #fff;
 }
 
+.winBtn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 34px rgba(232, 93, 4, 0.35);
+}
+
+.winBtn:active:not(:disabled) {
+  transform: translateY(0px);
+  box-shadow: 0 10px 22px rgba(232, 93, 4, 0.25);
+}
+
 .lossBtn {
+  background: rgba(232, 93, 4, 0.12);
+  border-color: rgba(232, 93, 4, 0.42);
+  color: var(--ball);
+}
+
+.lossBtn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  background: rgba(232, 93, 4, 0.18);
+  box-shadow: 0 14px 34px rgba(232, 93, 4, 0.18);
+}
+
+.lossBtn:active:not(:disabled) {
+  transform: translateY(0px);
+  box-shadow: 0 10px 22px rgba(232, 93, 4, 0.14);
+}
+
+.repinBtn {
+  padding: 0.38rem 0.7rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: linear-gradient(135deg, rgba(232, 93, 4, 0.95), rgba(255, 209, 102, 0.75));
+  color: #101010;
+  font-weight: 700;
+  font-size: 0.8rem;
+  cursor: pointer;
+  height: fit-content;
+  box-shadow: 0 10px 26px rgba(232, 93, 4, 0.35);
+}
+
+.repinBtn:hover:not(:disabled) {
+  box-shadow: 0 14px 34px rgba(232, 93, 4, 0.48);
+  transform: translateY(-1px);
+}
+
+.repinBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.respinOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.respinModal {
+  width: min(900px, 100%);
+  background: rgba(10, 63, 50, 0.96);
+  border: 1px solid rgba(212, 160, 58, 0.45);
+  border-radius: 16px;
+  padding: 1rem;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+}
+
+.respinHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.25rem;
+}
+
+.respinHeader h3 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.closeBtn {
+  border: none;
+  border-radius: 999px;
+  padding: 0.35rem 0.7rem;
   background: rgba(0, 0, 0, 0.3);
   color: var(--muted);
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.respinHelp {
+  margin: 0.4rem 0 1rem;
+  font-size: 0.9rem;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+@media (max-width: 520px) {
+  .gameRow {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+
+  .result {
+    flex-basis: auto;
+    width: 100%;
+    text-align: left;
+  }
+
+  .outcomeButtons {
+    width: 100%;
+    justify-content: flex-end;
+  }
 }
 
 .roundScores,

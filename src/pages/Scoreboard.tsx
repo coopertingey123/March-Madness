@@ -1,15 +1,18 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   getPlayers,
   getRounds,
   getRound,
   getAssignmentsForRound,
   getPlayerScores,
+  getRemainingGamesForRespin,
   setAssignmentHit,
+  replaceAssignmentGame,
 } from '../lib/db';
-import type { Player, Round, Assignment } from '../types';
+import type { Player, Round, Assignment, Game } from '../types';
 import styles from './Scoreboard.module.css';
 import { useGame } from '../context/GameContext';
+import WheelComponent from '../components/Wheel';
 
 export default function Scoreboard() {
   const { currentGame, role } = useGame();
@@ -20,6 +23,10 @@ export default function Scoreboard() {
   const [roundDetail, setRoundDetail] = useState<Round | null>(null);
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [loading, setLoading] = useState(true);
+  const [respinTargetAssignmentId, setRespinTargetAssignmentId] = useState<string | null>(null);
+  const respinTargetAssignmentIdRef = useRef<string | null>(null);
+  const [respinSpinSignal, setRespinSpinSignal] = useState(0);
+  const [wheelSpinning, setWheelSpinning] = useState(false);
 
   useEffect(() => {
     if (!currentGame) return;
@@ -45,6 +52,24 @@ export default function Scoreboard() {
       setAssignments(a);
     });
   }, [selectedRoundId]);
+
+  const refreshSelectedRound = async (roundId: string) => {
+    const [newAssignments, newScores] = await Promise.all([
+      getAssignmentsForRound(roundId),
+      getPlayerScores(),
+    ]);
+    setAssignments(newAssignments);
+    setScores(newScores);
+  };
+
+  const handleRespinComplete = async (game: Game) => {
+    const targetId = respinTargetAssignmentIdRef.current;
+    if (!roundDetail || !targetId) return;
+    await replaceAssignmentGame(targetId, game.id);
+    await refreshSelectedRound(roundDetail.id);
+    respinTargetAssignmentIdRef.current = null;
+    setRespinTargetAssignmentId(null);
+  };
 
   const handleSetOutcome = async (roundId: string, assignmentId: string, isWin: boolean) => {
     await setAssignmentHit(assignmentId, isWin);
@@ -119,7 +144,20 @@ export default function Scoreboard() {
                       <div className={styles.outcomeButtons}>
                         <button
                           type="button"
+                          className={styles.repinBtn}
+                          disabled={wheelSpinning || respinTargetAssignmentId != null}
+                          onClick={() => {
+                            respinTargetAssignmentIdRef.current = assignment.id;
+                            setRespinTargetAssignmentId(assignment.id);
+                            setRespinSpinSignal((s) => s + 1);
+                          }}
+                        >
+                          Re-spin
+                        </button>
+                        <button
+                          type="button"
                           className={styles.winBtn}
+                          disabled={wheelSpinning || respinTargetAssignmentId != null}
                           onClick={() => handleSetOutcome(roundDetail.id, assignment.id, true)}
                         >
                           Win
@@ -127,6 +165,7 @@ export default function Scoreboard() {
                         <button
                           type="button"
                           className={styles.lossBtn}
+                          disabled={wheelSpinning || respinTargetAssignmentId != null}
                           onClick={() => handleSetOutcome(roundDetail.id, assignment.id, false)}
                         >
                           Loss
@@ -140,6 +179,34 @@ export default function Scoreboard() {
           </>
         )}
       </section>
+
+      {roundDetail && respinTargetAssignmentId && (
+        <div className={styles.respinOverlay} role="dialog" aria-modal="true">
+          <div className={styles.respinModal}>
+            <div className={styles.respinHeader}>
+              <h3>Re-spin</h3>
+              <button
+                type="button"
+                className={styles.closeBtn}
+                onClick={() => {
+                  respinTargetAssignmentIdRef.current = null;
+                  setRespinTargetAssignmentId(null);
+                }}
+              >
+                Close
+              </button>
+            </div>
+            <p className={styles.respinHelp}>This replaces the current spread selection for the chosen player.</p>
+            <WheelComponent
+              segments={getRemainingGamesForRespin(roundDetail, assignments, respinTargetAssignmentId)}
+              onSpinComplete={handleRespinComplete}
+              disabled={wheelSpinning}
+              onSpinningChange={setWheelSpinning}
+              spinSignal={respinSpinSignal}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

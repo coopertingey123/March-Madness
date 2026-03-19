@@ -6,6 +6,7 @@ import {
   setDoc,
   addDoc,
   updateDoc,
+  deleteField,
   deleteDoc,
   query,
   where,
@@ -183,6 +184,11 @@ export async function createAssignment(roundId: string, gameId: string, playerId
   return { id: ref.id, roundId, gameId, playerId, spinOrder };
 }
 
+export async function replaceAssignmentGame(assignmentId: string, newGameId: string): Promise<void> {
+  // Assignment now points at a different spread, so any previously-set outcome is no longer valid.
+  await updateDoc(doc(db, ASSIGNMENTS, assignmentId), { gameId: newGameId, hit: deleteField() });
+}
+
 export async function setAssignmentHit(assignmentId: string, hit: boolean): Promise<void> {
   await updateDoc(doc(db, ASSIGNMENTS, assignmentId), { hit });
 }
@@ -205,5 +211,12 @@ export async function createAssignmentsBatch(roundId: string, pairs: { gameId: s
 // ——— Helpers for wheel: get remaining games (not yet assigned) for round
 export function getRemainingGames(round: Round, assignments: Assignment[]): Game[] {
   const assigned = new Set(assignments.map((a) => a.gameId));
+  return round.games.filter((g) => !assigned.has(g.id));
+}
+
+export function getRemainingGamesForRespin(round: Round, assignments: Assignment[], targetAssignmentId: string): Game[] {
+  // While respinning a specific assignment, we should exclude all other already-assigned games,
+  // but allow the current game for the target assignment to appear as a segment.
+  const assigned = new Set(assignments.filter((a) => a.id !== targetAssignmentId).map((a) => a.gameId));
   return round.games.filter((g) => !assigned.has(g.id));
 }

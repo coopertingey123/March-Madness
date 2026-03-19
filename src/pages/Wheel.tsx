@@ -1,12 +1,14 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
   getRound,
   getPlayers,
   getAssignmentsForRound,
   getRemainingGames,
+  getRemainingGamesForRespin,
   createAssignment,
   updateRoundSpin,
+  replaceAssignmentGame,
 } from '../lib/db';
 import { useGame } from '../context/GameContext';
 import WheelComponent from '../components/Wheel';
@@ -28,8 +30,14 @@ export default function WheelPage() {
   const [lastLanded, setLastLanded] = useState<{ game: Game; playerName: string } | null>(null);
   const [spinning, setSpinning] = useState(false);
   const [spinSignal, setSpinSignal] = useState(0);
+  const [respinTarget, setRespinTarget] = useState<AssignmentType | null>(null);
+  const respinTargetRef = useRef<AssignmentType | null>(null);
 
-  const remaining = round ? getRemainingGames(round, assignments) : [];
+  const remaining = round
+    ? respinTarget
+      ? getRemainingGamesForRespin(round, assignments, respinTarget.id)
+      : getRemainingGames(round, assignments)
+    : [];
   const currentSpin = round?.currentSpin ?? 0;
   const nextPlayerIndex = currentSpin % players.length;
   const nextPlayer = players[nextPlayerIndex] ?? null;
@@ -51,21 +59,27 @@ export default function WheelPage() {
   }, [roundId, currentGame]);
 
   const handleSpinComplete = async (game: Game) => {
-    if (!round || !nextPlayer) return;
-    await createAssignment(round.id, game.id, nextPlayer.id, currentSpin + 1);
+    if (!round) return;
+
+    const target = respinTargetRef.current;
+    if (target) {
+      await replaceAssignmentGame(target.id, game.id);
+      const playerName = players.find((p) => p.id === target.playerId)?.name ?? 'Unknown';
+      setAssignments((prev) =>
+        prev.map((a) => (a.id === target.id ? { ...a, gameId: game.id, hit: undefined } : a))
+      );
+      setLastLanded({ game, playerName });
+      setRespinTarget(null);
+      respinTargetRef.current = null;
+      return;
+    }
+
+    if (!nextPlayer) return;
     const newSpin = currentSpin + 1;
+    const created = await createAssignment(round.id, game.id, nextPlayer.id, newSpin);
     const isComplete = newSpin >= Math.min(round.games.length, SPINS_PER_ROUND);
     await updateRoundSpin(round.id, newSpin, isComplete ? new Date().toISOString() : undefined);
-    setAssignments([
-      ...assignments,
-      {
-        id: '',
-        roundId: round.id,
-        gameId: game.id,
-        playerId: nextPlayer.id,
-        spinOrder: newSpin,
-      },
-    ]);
+    setAssignments((prev) => [...prev, created]);
     setRound((prev) => (prev ? { ...prev, currentSpin: newSpin, completedAt: prev.completedAt } : null));
     setLastLanded({ game, playerName: nextPlayer.name });
   };
@@ -97,10 +111,13 @@ export default function WheelPage() {
 
   const done = currentSpin >= Math.min(round.games.length, SPINS_PER_ROUND);
 
-  const canSpin = role === 'host' && !done && !!nextPlayer && remaining.length > 0 && !spinning;
+  const canSpin =
+    role === 'host' && !done && !respinTarget && !!nextPlayer && remaining.length > 0 && !spinning;
 
   const triggerSpin = () => {
     if (!canSpin) return;
+    respinTargetRef.current = null;
+    setRespinTarget(null);
     setSpinSignal((s) => s + 1);
   };
 
@@ -109,8 +126,16 @@ export default function WheelPage() {
       <div className={styles.header}>
         <h1>{round.name}</h1>
         <p className={styles.meta}>
-          Spin {currentSpin} of {Math.min(round.games.length, SPINS_PER_ROUND)}
-          {nextPlayer && !done && ` · Next: ${nextPlayer.name}`}
+          {respinTarget ? (
+            <>
+              Re-spinning {players.find((p) => p.id === respinTarget.playerId)?.name ?? ''}
+            </>
+          ) : (
+            <>
+              Spin {currentSpin} of {Math.min(round.games.length, SPINS_PER_ROUND)}
+              {nextPlayer && !done && ` · Next: ${nextPlayer.name}`}
+            </>
+          )}
         </p>
       </div>
 
@@ -125,33 +150,37 @@ export default function WheelPage() {
           <WheelComponent
             segments={remaining}
             onSpinComplete={handleSpinComplete}
-            disabled={done || players.length === 0}
+            disabled={players.length === 0 || remaining.length === 0 || (!respinTarget && done)}
             onSpinningChange={setSpinning}
             spinSignal={spinSignal}
           />
         </div>
         <aside className={styles.infoCol}>
           <h2>Current spin</h2>
-          {done || !nextPlayer ? (
+          {respinTarget ? (
+            <>
+              <div className={styles.currentPlayerCard}>
+                <span className={styles.currentLabel}>{spinning ? 'Spinning for' : 'Re-spin for'}</span>
+                <span className={styles.currentName}>
+                  {players.find((p) => p.id === respinTarget.playerId)?.name ?? ''}
+                </span>
+              </div>
+              <p className={styles.mutedSmall}>Remaining spreads on wheel: {remaining.length}</p>
+              <p className={styles.mutedSmall}>
+                {spinning ? 'Wheel is spinning…' : 'Pick another spread below to re-spin again.'}
+              </p>
+            </>
+          ) : done || !nextPlayer ? (
             <p className={styles.muted}>Wheel is complete for this round.</p>
           ) : (
             <>
               <div className={styles.currentPlayerCard}>
-                <span className={styles.currentLabel}>
-                  {spinning ? 'Spinning for' : 'Up next'}
-                </span>
+                <span className={styles.currentLabel}>{spinning ? 'Spinning for' : 'Up next'}</span>
                 <span className={styles.currentName}>{nextPlayer.name}</span>
               </div>
-              <p className={styles.mutedSmall}>
-                Remaining spreads on wheel: {remaining.length}
-              </p>
+              <p className={styles.mutedSmall}>Remaining spreads on wheel: {remaining.length}</p>
               {role === 'host' ? (
-                <button
-                  type="button"
-                  className={styles.spinBtn}
-                  onClick={triggerSpin}
-                  disabled={!canSpin}
-                >
+                <button type="button" className={styles.spinBtn} onClick={triggerSpin} disabled={!canSpin}>
                   {spinning ? 'Spinning…' : 'Spin wheel'}
                 </button>
               ) : (
@@ -189,8 +218,25 @@ export default function WheelPage() {
                       const game = round.games.find((g) => g.id === a.gameId);
                       if (!game) return null;
                       return (
-                        <span key={a.id} className={styles.assignmentTag}>
-                          {game.display}
+                        <span key={a.id} className={styles.assignmentTagWrap}>
+                          <span className={styles.assignmentTag}>{game.display}</span>
+                          {role === 'host' && (
+                            <button
+                              type="button"
+                              className={[
+                                styles.respinBtn,
+                                respinTarget?.id === a.id ? styles.respinBtnActive : '',
+                              ].join(' ')}
+                              disabled={spinning}
+                              onClick={() => {
+                                respinTargetRef.current = a;
+                                setRespinTarget(a);
+                                setSpinSignal((s) => s + 1);
+                              }}
+                            >
+                              Re-spin
+                            </button>
+                          )}
                         </span>
                       );
                     })}
