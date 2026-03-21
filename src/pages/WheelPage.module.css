@@ -230,6 +230,27 @@
   outline-offset: 1px;
 }
 
+.deletePickBtn {
+  font-size: 0.7rem;
+  padding: 0.2rem 0.45rem;
+  border-radius: 999px;
+  border: 1px solid rgba(230, 57, 70, 0.6);
+  background: rgba(230, 57, 70, 0.12);
+  color: #f4f1de;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.deletePickBtn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  background: rgba(230, 57, 70, 0.22);
+}
+
+.deletePickBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .muted {
   color: var(--muted);
 }

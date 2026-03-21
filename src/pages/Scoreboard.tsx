@@ -8,6 +8,8 @@ import {
   getRemainingGamesForRespin,
   setAssignmentHit,
   replaceAssignmentGame,
+  deleteAssignment,
+  rewindRoundSpin,
 } from '../lib/db';
 import type { Player, Round, Assignment, Game } from '../types';
 import styles from './Scoreboard.module.css';
@@ -54,10 +56,12 @@ export default function Scoreboard() {
   }, [selectedRoundId]);
 
   const refreshSelectedRound = async (roundId: string) => {
-    const [newAssignments, newScores] = await Promise.all([
+    const [nextRound, newAssignments, newScores] = await Promise.all([
+      getRound(roundId),
       getAssignmentsForRound(roundId),
       getPlayerScores(),
     ]);
+    setRoundDetail(nextRound ?? null);
     setAssignments(newAssignments);
     setScores(newScores);
   };
@@ -79,6 +83,17 @@ export default function Scoreboard() {
     ]);
     setAssignments(newAssignments);
     setScores(newScores);
+  };
+
+  const handleDeletePick = async (roundId: string, assignmentId: string) => {
+    const nextAssignments = assignments.filter((a) => a.id !== assignmentId);
+    await deleteAssignment(assignmentId);
+    await rewindRoundSpin(roundId, nextAssignments.length);
+    if (respinTargetAssignmentId === assignmentId) {
+      respinTargetAssignmentIdRef.current = null;
+      setRespinTargetAssignmentId(null);
+    }
+    await refreshSelectedRound(roundId);
   };
 
   if (!currentGame) {
@@ -153,6 +168,14 @@ export default function Scoreboard() {
                           }}
                         >
                           Re-spin
+                        </button>
+                        <button
+                          type="button"
+                          className={styles.deleteBtn}
+                          disabled={wheelSpinning || respinTargetAssignmentId != null}
+                          onClick={() => handleDeletePick(roundDetail.id, assignment.id)}
+                        >
+                          Delete
                         </button>
                         <button
                           type="button"

@@ -189,6 +189,10 @@ export async function replaceAssignmentGame(assignmentId: string, newGameId: str
   await updateDoc(doc(db, ASSIGNMENTS, assignmentId), { gameId: newGameId, hit: deleteField() });
 }
 
+export async function deleteAssignment(assignmentId: string): Promise<void> {
+  await deleteDoc(doc(db, ASSIGNMENTS, assignmentId));
+}
+
 export async function setAssignmentHit(assignmentId: string, hit: boolean): Promise<void> {
   await updateDoc(doc(db, ASSIGNMENTS, assignmentId), { hit });
 }
@@ -219,4 +223,8 @@ export function getRemainingGamesForRespin(round: Round, assignments: Assignment
   // but allow the current game for the target assignment to appear as a segment.
   const assigned = new Set(assignments.filter((a) => a.id !== targetAssignmentId).map((a) => a.gameId));
   return round.games.filter((g) => !assigned.has(g.id));
+}
+
+export async function rewindRoundSpin(roundId: string, currentSpin: number): Promise<void> {
+  await updateDoc(doc(db, ROUNDS, roundId), { currentSpin, completedAt: deleteField() });
 }

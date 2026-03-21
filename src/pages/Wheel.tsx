@@ -9,6 +9,8 @@ import {
   createAssignment,
   updateRoundSpin,
   replaceAssignmentGame,
+  deleteAssignment,
+  rewindRoundSpin,
 } from '../lib/db';
 import { useGame } from '../context/GameContext';
 import WheelComponent from '../components/Wheel';
@@ -121,6 +123,21 @@ export default function WheelPage() {
     setSpinSignal((s) => s + 1);
   };
 
+  const handleDeletePick = async (assignmentId: string) => {
+    if (!round || role !== 'host') return;
+
+    const nextAssignments = assignments.filter((a) => a.id !== assignmentId);
+    await deleteAssignment(assignmentId);
+    await rewindRoundSpin(round.id, nextAssignments.length);
+    setAssignments(nextAssignments);
+    setRound((prev) => (prev ? { ...prev, currentSpin: nextAssignments.length, completedAt: undefined } : null));
+
+    if (respinTargetRef.current?.id === assignmentId) {
+      respinTargetRef.current = null;
+      setRespinTarget(null);
+    }
+  };
+
   return (
     <div className={styles.page}>
       <div className={styles.header}>
@@ -221,21 +238,31 @@ export default function WheelPage() {
                         <span key={a.id} className={styles.assignmentTagWrap}>
                           <span className={styles.assignmentTag}>{game.display}</span>
                           {role === 'host' && (
-                            <button
-                              type="button"
-                              className={[
-                                styles.respinBtn,
-                                respinTarget?.id === a.id ? styles.respinBtnActive : '',
-                              ].join(' ')}
-                              disabled={spinning}
-                              onClick={() => {
-                                respinTargetRef.current = a;
-                                setRespinTarget(a);
-                                setSpinSignal((s) => s + 1);
-                              }}
-                            >
-                              Re-spin
-                            </button>
+                            <>
+                              <button
+                                type="button"
+                                className={[
+                                  styles.respinBtn,
+                                  respinTarget?.id === a.id ? styles.respinBtnActive : '',
+                                ].join(' ')}
+                                disabled={spinning}
+                                onClick={() => {
+                                  respinTargetRef.current = a;
+                                  setRespinTarget(a);
+                                  setSpinSignal((s) => s + 1);
+                                }}
+                              >
+                                Re-spin
+                              </button>
+                              <button
+                                type="button"
+                                className={styles.deletePickBtn}
+                                disabled={spinning}
+                                onClick={() => handleDeletePick(a.id)}
+                              >
+                                Delete
+                              </button>
+                            </>
                           )}
                         </span>
                       );
