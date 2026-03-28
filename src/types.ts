@@ -51,6 +51,8 @@ export interface Round {
   name: string; // e.g. "Round of 64", "Sweet 16"
   order: number;
   games: Game[];
+  /** Player ids eligible to spin this round (defaults to all players when omitted). */
+  eligiblePlayerIds?: PlayerId[];
   /** 1–30, current spin (0 = not started) */
   currentSpin: number;
   completedAt?: string; // ISO when wheel finished

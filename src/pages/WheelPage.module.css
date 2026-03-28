@@ -96,6 +96,42 @@
   color: var(--muted);
 }
 
+.eligiblePlayers {
+  margin-top: 1rem;
+  padding-top: 0.8rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.selectorTitle {
+  margin: 0 0 0.45rem;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
+.selectorList {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.selectorItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.9rem;
+}
+
+.selectorItem input {
+  accent-color: var(--ball);
+}
+
+.selectorHelp {
+  margin: 0.6rem 0 0;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
 .spinBtn {
   margin-top: 1rem;
   width: 100%;

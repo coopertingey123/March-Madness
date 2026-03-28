@@ -91,11 +91,15 @@ export async function getRounds(gameId: string): Promise<Round[]> {
   );
   const rounds = snap.docs.map((d: { id: string; data: () => Record<string, unknown> }) => {
     const data = d.data();
+    const eligiblePlayerIds = Array.isArray(data.eligiblePlayerIds)
+      ? data.eligiblePlayerIds.filter((id: unknown): id is string => typeof id === 'string')
+      : undefined;
     return {
       id: d.id,
       name: data.name,
       order: data.order,
       games: data.games ?? [],
+      eligiblePlayerIds,
       currentSpin: data.currentSpin ?? 0,
       completedAt: data.completedAt ?? undefined,
     } as Round;
@@ -107,11 +111,15 @@ export async function getRound(roundId: string): Promise<Round | null> {
   const d = await getDoc(doc(db, ROUNDS, roundId));
   if (!d.exists()) return null;
   const data = d.data();
+  const eligiblePlayerIds = Array.isArray(data.eligiblePlayerIds)
+    ? data.eligiblePlayerIds.filter((id: unknown): id is string => typeof id === 'string')
+    : undefined;
   return {
     id: d.id,
     name: data.name,
     order: data.order,
     games: data.games ?? [],
+    eligiblePlayerIds,
     currentSpin: data.currentSpin ?? 0,
     completedAt: data.completedAt ?? undefined,
   } as Round;
@@ -142,6 +150,10 @@ export async function updateRoundSpin(roundId: string, currentSpin: number, comp
   const payload: Record<string, unknown> = { currentSpin };
   if (completedAt != null) payload.completedAt = completedAt;
   await updateDoc(doc(db, ROUNDS, roundId), payload);
+}
+
+export async function updateRoundEligiblePlayers(roundId: string, eligiblePlayerIds: string[]): Promise<void> {
+  await updateDoc(doc(db, ROUNDS, roundId), { eligiblePlayerIds });
 }
 
 /** Compute total score for a player across all rounds (assignments where hit === true). */

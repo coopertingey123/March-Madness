@@ -11,6 +11,7 @@ import {
   replaceAssignmentGame,
   deleteAssignment,
   rewindRoundSpin,
+  updateRoundEligiblePlayers,
 } from '../lib/db';
 import { useGame } from '../context/GameContext';
 import WheelComponent from '../components/Wheel';
@@ -18,8 +19,12 @@ import type { Round, Player, Game, Assignment as AssignmentType } from '../types
 import styles from './WheelPage.module.css';
 
 const LOOPS = 3;
-const PLAYER_COUNT = 10;
-const SPINS_PER_ROUND = LOOPS * PLAYER_COUNT;
+function getEligiblePlayers(round: Round | null, players: Player[]): Player[] {
+  if (!round || players.length === 0) return [];
+  if (!round.eligiblePlayerIds || round.eligiblePlayerIds.length === 0) return players;
+  const eligible = players.filter((player) => round.eligiblePlayerIds?.includes(player.id));
+  return eligible.length > 0 ? eligible : players;
+}
 
 export default function WheelPage() {
   const { currentGame, role } = useGame();
@@ -33,6 +38,7 @@ export default function WheelPage() {
   const [spinning, setSpinning] = useState(false);
   const [spinSignal, setSpinSignal] = useState(0);
   const [respinTarget, setRespinTarget] = useState<AssignmentType | null>(null);
+  const [savingEligiblePlayers, setSavingEligiblePlayers] = useState(false);
   const respinTargetRef = useRef<AssignmentType | null>(null);
 
   const remaining = round
@@ -41,8 +47,11 @@ export default function WheelPage() {
       : getRemainingGames(round, assignments)
     : [];
   const currentSpin = round?.currentSpin ?? 0;
-  const nextPlayerIndex = currentSpin % players.length;
-  const nextPlayer = players[nextPlayerIndex] ?? null;
+  const eligiblePlayers = getEligiblePlayers(round, players);
+  const spinsPerRound = LOOPS * eligiblePlayers.length;
+  const maxSpins = round ? Math.min(round.games.length, spinsPerRound) : 0;
+  const nextPlayerIndex = eligiblePlayers.length > 0 ? currentSpin % eligiblePlayers.length : 0;
+  const nextPlayer = eligiblePlayers[nextPlayerIndex] ?? null;
 
   useEffect(() => {
     if (!roundId || !currentGame) {
@@ -79,10 +88,11 @@ export default function WheelPage() {
     if (!nextPlayer) return;
     const newSpin = currentSpin + 1;
     const created = await createAssignment(round.id, game.id, nextPlayer.id, newSpin);
-    const isComplete = newSpin >= Math.min(round.games.length, SPINS_PER_ROUND);
-    await updateRoundSpin(round.id, newSpin, isComplete ? new Date().toISOString() : undefined);
+    const isComplete = newSpin >= maxSpins;
+    const completedAt = isComplete ? new Date().toISOString() : undefined;
+    await updateRoundSpin(round.id, newSpin, completedAt);
     setAssignments((prev) => [...prev, created]);
-    setRound((prev) => (prev ? { ...prev, currentSpin: newSpin, completedAt: prev.completedAt } : null));
+    setRound((prev) => (prev ? { ...prev, currentSpin: newSpin, completedAt } : null));
     setLastLanded({ game, playerName: nextPlayer.name });
   };
 
@@ -111,10 +121,16 @@ export default function WheelPage() {
     );
   }
 
-  const done = currentSpin >= Math.min(round.games.length, SPINS_PER_ROUND);
+  const done = currentSpin >= maxSpins;
 
   const canSpin =
-    role === 'host' && !done && !respinTarget && !!nextPlayer && remaining.length > 0 && !spinning;
+    role === 'host' &&
+    !done &&
+    !respinTarget &&
+    !!nextPlayer &&
+    eligiblePlayers.length > 0 &&
+    remaining.length > 0 &&
+    !spinning;
 
   const triggerSpin = () => {
     if (!canSpin) return;
@@ -138,6 +154,34 @@ export default function WheelPage() {
     }
   };
 
+  const canEditEligiblePlayers = role === 'host' && assignments.length === 0 && !spinning && !respinTarget;
+  const handleToggleEligiblePlayer = async (playerId: string) => {
+    if (!round || !canEditEligiblePlayers || savingEligiblePlayers) return;
+
+    const currentIds = eligiblePlayers.map((player) => player.id);
+    const isIncluded = currentIds.includes(playerId);
+    const nextIds = isIncluded
+      ? currentIds.filter((id) => id !== playerId)
+      : [...currentIds, playerId];
+
+    if (nextIds.length === 0) {
+      window.alert('Keep at least one player in the spin list.');
+      return;
+    }
+
+    const orderedNextIds = players
+      .filter((player) => nextIds.includes(player.id))
+      .map((player) => player.id);
+
+    setSavingEligiblePlayers(true);
+    try {
+      await updateRoundEligiblePlayers(round.id, orderedNextIds);
+      setRound((prev) => (prev ? { ...prev, eligiblePlayerIds: orderedNextIds } : null));
+    } finally {
+      setSavingEligiblePlayers(false);
+    }
+  };
+
   return (
     <div className={styles.page}>
       <div className={styles.header}>
@@ -149,7 +193,8 @@ export default function WheelPage() {
             </>
           ) : (
             <>
-              Spin {currentSpin} of {Math.min(round.games.length, SPINS_PER_ROUND)}
+              Spin {currentSpin} of {maxSpins}
+              {players.length > 0 && ` · Players in spin: ${eligiblePlayers.length}/${players.length}`}
               {nextPlayer && !done && ` · Next: ${nextPlayer.name}`}
             </>
           )}
@@ -167,7 +212,7 @@ export default function WheelPage() {
           <WheelComponent
             segments={remaining}
             onSpinComplete={handleSpinComplete}
-            disabled={players.length === 0 || remaining.length === 0 || (!respinTarget && done)}
+            disabled={eligiblePlayers.length === 0 || remaining.length === 0 || (!respinTarget && done)}
             onSpinningChange={setSpinning}
             spinSignal={spinSignal}
           />
@@ -196,6 +241,32 @@ export default function WheelPage() {
                 <span className={styles.currentName}>{nextPlayer.name}</span>
               </div>
               <p className={styles.mutedSmall}>Remaining spreads on wheel: {remaining.length}</p>
+              {role === 'host' && players.length > 0 && (
+                <div className={styles.eligiblePlayers}>
+                  <p className={styles.selectorTitle}>Players in this round</p>
+                  <div className={styles.selectorList}>
+                    {players.map((player) => {
+                      const checked = eligiblePlayers.some((eligible) => eligible.id === player.id);
+                      return (
+                        <label key={player.id} className={styles.selectorItem}>
+                          <input
+                            type="checkbox"
+                            checked={checked}
+                            disabled={!canEditEligiblePlayers || savingEligiblePlayers}
+                            onChange={() => handleToggleEligiblePlayer(player.id)}
+                          />
+                          <span>{player.name}</span>
+                        </label>
+                      );
+                    })}
+                  </div>
+                  {!canEditEligiblePlayers ? (
+                    <p className={styles.selectorHelp}>Spin list locks after the first assignment.</p>
+                  ) : (
+                    <p className={styles.selectorHelp}>Uncheck anyone you want to skip this round.</p>
+                  )}
+                </div>
+              )}
               {role === 'host' ? (
                 <button type="button" className={styles.spinBtn} onClick={triggerSpin} disabled={!canSpin}>
                   {spinning ? 'Spinning…' : 'Spin wheel'}
